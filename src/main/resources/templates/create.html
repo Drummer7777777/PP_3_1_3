@@ -6,12 +6,17 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/admin/users}" th:object="${user}">
+<form th:method="POST" th:action="@{/admin}" th:object="${user}">
     <label for="username">Enter username: </label>
     <input type="text" th:field="*{username}" id="username"/>
     <label for="surname">Enter surname: </label>
     <input type="text" th:field="*{surname}" id="surname"/>
-    <br/>
+    <label for="password">Enter password: </label>
+    <input type="password" th:field="*{password}" id="password"/>
+    <div th:each="role : ${roles}">
+        <input type="checkbox" th:field="${user.roles}" th:value="${role.getName()}" id="roles"/>
+        <label for="roles" th:text="${role.getName()}">Role</label>
+    </div>
     <input type="submit" value="Create!"/>
 </form>
 <a th:href="@{/logout}">Logout</a>

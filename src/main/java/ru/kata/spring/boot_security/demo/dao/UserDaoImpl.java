@@ -1,11 +1,12 @@
 package ru.kata.spring.boot_security.demo.dao;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.List;
 
 @Repository
@@ -21,7 +22,7 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public void add(User user) {
-        entityManager.persist(user);
+        entityManager.merge(user);
     }
 
     @Override
@@ -42,10 +43,15 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
+    @Query("Select u from User u left join fetch u.roles where u.username=:username")
     public User findByUsername(String username) {
-        User user = entityManager.createQuery(
-                        "SELECT u from User u WHERE u.username = :username", User.class).
-                setParameter("username", username).getSingleResult();
-        return user;
+        try {
+            User user = entityManager.createQuery(
+                            "SELECT u from User u WHERE u.username = :username", User.class).
+                    setParameter("username", username).getSingleResult();
+            return user;
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }
