@@ -3,7 +3,6 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
@@ -12,7 +11,6 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Controller
@@ -26,10 +24,15 @@ public class AdminController {
     }
 
     @GetMapping(value = "/admin")
-    public String printUsers(ModelMap model) { //, @RequestParam(defaultValue = "5", name = "count") int count) {
+    public String printUsers(ModelMap model, Principal principal) { //, @RequestParam(defaultValue = "5", name = "count") int count) {
         List<User> usersResponse = new ArrayList<>(userService.listUsers());
         model.addAttribute("users" , usersResponse);
-        return "users";
+        List<Role> rolesResponse = new ArrayList<>(roleService.listRoles());
+        model.addAttribute("roles", rolesResponse);
+        model.addAttribute("user", new User());
+        User principalUser = userService.findByUsername(principal.getName());
+        model.addAttribute("principalUser", principalUser);
+        return "admin";
     }
 
     @GetMapping(value = "/admin/create")
@@ -37,7 +40,7 @@ public class AdminController {
         model.addAttribute("user", new User());
         List<Role> rolesResponse = new ArrayList<>(roleService.listRoles());
         model.addAttribute("roles", rolesResponse);
-        return "create";
+        return "admin";
     }
 
     @PostMapping(value = "/admin")
@@ -55,13 +58,13 @@ public class AdminController {
     @GetMapping(value = "/admin/edit")
     public String editUser(Model model, @RequestParam(name = "id") int id) {
         model.addAttribute("user", userService.getById(id));
-        return "edit";
+        return "admin";
     }
 
     @PatchMapping(value = "/admin/users")
-    public String applyEditUser(Principal principal, @ModelAttribute("user") User user, @RequestParam(name = "id") int id) {
+    public String applyEditUser(Principal principal, User user, @RequestParam(name = "id") int id) {
         user.setId(id);
-        user.setPassword(userService.findByUsername(principal.getName()).getPassword());
+//        user.setPassword(userService.findByUsername(principal.getName()).getPassword());
         userService.edit(user);
         return "redirect:/admin";
     }

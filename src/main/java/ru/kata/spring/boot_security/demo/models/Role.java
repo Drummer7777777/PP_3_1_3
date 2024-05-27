@@ -38,7 +38,7 @@ public class Role implements GrantedAuthority {
     }
 
     public String getTrimName() {   // удаляеи ROLE_ из роли
-        return name.replace("ROLE_", " ");
+        return name.replace("ROLE_", "");
     }
 
     public Role getRole() {

@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "userss")
@@ -34,6 +36,10 @@ public class User implements UserDetails {
     public User(String username, String surname) {
         this.username = username;
         this.surname = surname;
+    }
+
+    public List<String> getRolesName() {
+        return roles.stream().map(Role::getTrimName).collect(Collectors.toList());
     }
 
     public Integer getId() {
